@@ -179,7 +179,8 @@ static void Wiimote_dealloc(Wiimote *self)
 		cwiid_close(self->wiimote);
 	}
 	Py_XDECREF(self->callback);
-	self->ob_type->tp_free((PyObject *)self);
+	//self->ob_type->tp_free((PyObject *)self);
+	Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
 static int Wiimote_init(Wiimote* self, PyObject* args, PyObject *kwds)
