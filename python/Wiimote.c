@@ -199,7 +199,7 @@ static int Wiimote_init(Wiimote* self, PyObject* args, PyObject *kwds)
 	 * an existing CObject.  Otherwise, create a new one */
 	if (PyTuple_Size(args) == 1) {
 		PyObj = PyTuple_GET_ITEM(args, 0);
-		if (PyCObject_Check(PyObj)) {
+		if (PyCapsule_CheckExact(PyObj)) {
 			wiimote = PyCObject_AsVoidPtr(PyObj);
 			self->close_on_dealloc = 0;
 		}
@@ -805,7 +805,7 @@ static PyObject *Wiimote_read(Wiimote *self, PyObject *args, PyObject *kwds)
 		return NULL;
 	}
 
-	if (!(pyRetBuf = PyBuffer_New(len))) {
+	if (!(pyRetBuf = malloc(len))) {
 		return NULL;
 	}
 	if (PyObject_AsWriteBuffer(pyRetBuf, &buf, &len)) {
