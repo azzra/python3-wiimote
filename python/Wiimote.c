@@ -34,6 +34,9 @@
   #endif
 #endif
 
+// compat
+#define PyInt_AsLong(x) (PyLong_AsLong((x)))
+
 typedef struct {
 	PyObject_HEAD
 	cwiid_wiimote_t *wiimote;
