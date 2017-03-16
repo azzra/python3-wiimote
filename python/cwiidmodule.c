@@ -162,7 +162,7 @@ PyMODINIT_FUNC initcwiid(void)
 		                        cwiid_constants[i].value);
 	}
 
-	if (!(CObj = PyCObject_FromVoidPtr(ConvertMesgArray, NULL))) {
+	if (!(CObj = PyCapsule_New(ConvertMesgArray, "dynamr", NULL))) {
 		return;
 	}
 	PyModule_AddObject(Module, "ConvertMesgArray", CObj);
