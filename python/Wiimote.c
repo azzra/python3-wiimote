@@ -36,6 +36,7 @@
 
 // compat
 #define PyInt_AsLong(x) (PyLong_AsLong((x)))
+#define PyInt_FromLong(x) (PyLong_FromLong((x)))
 
 typedef struct {
 	PyObject_HEAD
@@ -200,7 +201,7 @@ static int Wiimote_init(Wiimote* self, PyObject* args, PyObject *kwds)
 	if (PyTuple_Size(args) == 1) {
 		PyObj = PyTuple_GET_ITEM(args, 0);
 		if (PyCapsule_CheckExact(PyObj)) {
-			wiimote = PyCObject_AsVoidPtr(PyObj);
+			wiimote = PyCapsule_GetPointer(PyObj, "dynamr");
 			self->close_on_dealloc = 0;
 		}
 	}

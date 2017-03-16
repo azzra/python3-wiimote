@@ -138,7 +138,7 @@ static PyMethodDef Module_Methods[] =
 PyMODINIT_FUNC initcwiid(void)
 {
 	PyObject *Module;
-	PyObject *CObj;
+	PyObject *CCapsule;
 	int i;
 
 	PyEval_InitThreads();
@@ -162,9 +162,9 @@ PyMODINIT_FUNC initcwiid(void)
 		                        cwiid_constants[i].value);
 	}
 
-	if (!(CObj = PyCapsule_New(ConvertMesgArray, "dynamr", NULL))) {
+	if (!(CCapsule = PyCapsule_New(ConvertMesgArray, "dynamr", NULL))) {
 		return;
 	}
-	PyModule_AddObject(Module, "ConvertMesgArray", CObj);
+	PyModule_AddObject(Module, "ConvertMesgArray", CCapsule);
 }
 
