@@ -26,18 +26,6 @@
 #include <bluetooth/bluetooth.h>
 #include <cwiid.h>
 
-#if (PY_VERSION_HEX < 0x02050000)
-  #ifndef PY_SSIZE_T_MIN
-    typedef int Py_ssize_t;
-    #define PY_SSIZE_T_MAX INT_MAX
-    #define PY_SSIZE_T_MIN INT_MIN
-  #endif
-#endif
-
-// compat
-#define PyInt_AsLong(x) (PyLong_AsLong((x)))
-#define PyInt_FromLong(x) (PyLong_FromLong((x)))
-
 typedef struct {
 	PyObject_HEAD
 	cwiid_wiimote_t *wiimote;
@@ -120,7 +108,6 @@ static PyGetSetDef Wiimote_GetSet[] = {
 
 PyTypeObject Wiimote_Type = {
 	PyObject_HEAD_INIT(NULL)
-	0,						/* ob_size */
 	"cwiid.Wiimote",		/* tp_name */
 	sizeof(Wiimote),		/* tp_basicsize */
 	0,						/* tp_itemsize */
@@ -460,7 +447,7 @@ static PyObject *Wiimote_get_state(Wiimote* self, void *closure)
 				}
 
 				if (state.ir_src[i].size != -1) {
-					if (!(PySize = PyInt_FromLong(
+					if (!(PySize = PyLong_FromLong(
 					  (long)state.ir_src[i].size))) {
 						Py_DECREF(PyState);
 						Py_DECREF(PyIrSrc);
@@ -687,7 +674,7 @@ static int Wiimote_set_led(Wiimote *self, PyObject *PyLed, void *closure)
 		return -1;
 	}
 
-	if (((led = PyInt_AsLong(PyLed)) == -1) && PyErr_Occurred()) {
+	if (((led = PyLong_AsLong(PyLed)) == -1) && PyErr_Occurred()) {
 		return -1;
 	}
 
@@ -710,7 +697,7 @@ static int
 		return -1;
 	}
 
-	if (((rumble = PyInt_AsLong(PyRumble)) == -1) && PyErr_Occurred()) {
+	if (((rumble = PyLong_AsLong(PyRumble)) == -1) && PyErr_Occurred()) {
 		return -1;
 	}
 
@@ -733,7 +720,7 @@ static int
 		return -1;
 	}
 
-	if (((rpt_mode = PyInt_AsLong(PyRptMode)) == -1) && PyErr_Occurred()) {
+	if (((rpt_mode = PyLong_AsLong(PyRptMode)) == -1) && PyErr_Occurred()) {
 		return -1;
 	}
 
@@ -948,7 +935,7 @@ PyObject *ConvertMesgArray(int mesg_count, union cwiid_mesg mesg[])
 					}
 
 					if (mesg[i].ir_mesg.src[j].size != -1) {
-						if (!(PySize = PyInt_FromLong(
+						if (!(PySize = PyLong_FromLong(
 						  (long)mesg[i].ir_mesg.src[j].size))) {
 							Py_DECREF(PyIrList);
 							Py_DECREF(PyIrSrc);

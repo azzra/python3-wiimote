@@ -27,31 +27,6 @@
 #include <cwiid.h>
 #include "structmember.h"
 
-
-static PyObject* hello_module_print_hello_world(PyObject *self, PyObject *args)
-{
-	printf("Hello World\n");
-	Py_RETURN_NONE;
-}
-
-static PyMethodDef hello_module_methods[] = { 
-	{   
-		"print_hello_world",
-		hello_module_print_hello_world,
-		METH_NOARGS,
-		"Print 'hello world' from a method defined in a C extension."
-	},  
-	{NULL, NULL, 0, NULL}
-};
-
-static struct PyModuleDef hello_module_definition = { 
-	PyModuleDef_HEAD_INIT,
-	"hello_module",
-	"A Python module that prints 'hello world' from C code.",
-	-1, 
-	hello_module_methods
-};
-
 /* externally defined types */
 extern PyTypeObject Wiimote_Type;
 extern PyObject *ConvertMesgArray(int, union cwiid_mesg []);
@@ -163,7 +138,7 @@ static PyMethodDef Module_Methods[] =
 static struct PyModuleDef moduledef = {
 	PyModuleDef_HEAD_INIT,
 	"cwiid",             /* m_name */
-	"Cwiid dynamr",      /* m_doc */
+	"Cwiid FFS!",        /* m_doc */
 	-1,                  /* m_size */
 	Module_Methods,      /* m_methods */
 	NULL,                /* m_reload */
@@ -178,23 +153,19 @@ PyMODINIT_FUNC PyInit_cwiid(void)
 	PyObject *CCapsule;
 	int i;
 
-	Py_Initialize();
-	PyEval_InitThreads();
-
-/*
-	if (PyType_Ready(&Wiimote_Type) < 0) {
-		return;
-	}
-*/
-
 	if (!(Module = PyModule_Create(&moduledef))) {
 		return;
 	}
 
-	Py_INCREF(&Wiimote_Type);
-//	PyModule_AddObject(Module, "Wiimote", (PyObject*)&Wiimote_Type);
+	Wiimote_Type.tp_new = PyType_GenericNew;
+    if (PyType_Ready(&Wiimote_Type) < 0) {
+        return NULL;
+    }
 
-	for (i = 0; cwiid_constants[i].name; i++) {
+    Py_INCREF(&Wiimote_Type);
+    PyModule_AddObject(Module, "Wiimote", (PyObject *)&Wiimote_Type);
+
+    for (i = 0; cwiid_constants[i].name; i++) {
 		/* No way to report errors from here, so just ignore them and hope
 		 * for segfault */
 		PyModule_AddIntConstant(Module, cwiid_constants[i].name,
@@ -205,6 +176,6 @@ PyMODINIT_FUNC PyInit_cwiid(void)
 		return;
 	}
 	PyModule_AddObject(Module, "ConvertMesgArray", CCapsule);
+	
 	return Module;
 }
-
