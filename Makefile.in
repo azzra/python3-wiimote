@@ -3,20 +3,15 @@
 include @top_builddir@/defs.mak
 
 LIB_DIRS = libcwiid
-DOC_DIRS = man doc
 ifdef PYTHON
 BIND_DIRS = python
 endif
 
-SUB_DIRS = $(LIB_DIRS) $(DOC_DIRS) $(BIND_DIRS)
+SUB_DIRS = $(LIB_DIRS) $(BIND_DIRS)
 
 all install clean distclean uninstall: TARGET += $(MAKECMDGOALS)
 
 all install clean distclean uninstall: $(LIB_DIRS) $(BIND_DIRS)
-
-install uninstall distclean: $(DOC_DIRS)
-
-#all clean distclean: wmdemo
 
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
