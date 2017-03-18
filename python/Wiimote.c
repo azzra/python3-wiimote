@@ -107,7 +107,8 @@ static PyGetSetDef Wiimote_GetSet[] = {
 };
 
 PyTypeObject Wiimote_Type = {
-	PyObject_HEAD_INIT(NULL)
+//	PyObject_HEAD_INIT(NULL)
+	PyVarObject_HEAD_INIT(NULL, 0)
 	"cwiid.Wiimote",		/* tp_name */
 	sizeof(Wiimote),		/* tp_basicsize */
 	0,						/* tp_itemsize */
