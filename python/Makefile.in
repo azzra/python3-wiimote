@@ -10,10 +10,10 @@ all:
 	$(PYTHON) setup.py build_ext $(DEBUGFLAGS) -I@top_builddir@/libcwiid -L@top_builddir@/libcwiid
 
 install:
-	$(PYTHON) setup.py install --install-lib=${libdir}/python@PYTHON_VERSION@/site-packages $(SET_ROOT_DIR)
+	$(PYTHON) setup.py install --install-lib=${libdir}/python@PYTHON_VERSION@/site-packages $(SET_ROOT_DIR)  --record installed_files.txt
 
 uninstall:
-	rm -f $(ROOTDIR)${libdir}/python@PYTHON_VERSION@/site-packages/cwiid.so
+	cat installed_files.txt | xargs rm -rf
 
 clean:
 	rm -rf build

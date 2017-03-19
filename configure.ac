@@ -21,7 +21,7 @@ AC_ARG_WITH(
 	[case $withval in 
 		yes)
 			REQUIRE_PYTHON=1
-			PYTHON_NAME=python
+			PYTHON_NAME=python3
 		;;
 		no)
 			REQUIRE_PYTHON=
@@ -32,7 +32,7 @@ AC_ARG_WITH(
 			PYTHON_NAME=$withval
 		;;
 	esac],
-	[REQUIRE_PYTHON=1; PYTHON_NAME=python])
+	[REQUIRE_PYTHON=1; PYTHON_NAME=python3])
 if test $REQUIRE_PYTHON; then
 	AC_CHECK_PROGS([PYTHON],$PYTHON_NAME)
 	if test $REQUIRE_PYTHON -a ! $PYTHON; then
@@ -41,7 +41,7 @@ if test $REQUIRE_PYTHON; then
 fi
 AC_SUBST(PYTHON)
 if test $PYTHON; then
-	PYTHON_VERSION=[`$PYTHON -c 'import sys; print sys.version[:3]'`]
+	PYTHON_VERSION=[`$PYTHON -c 'import sys; print(sys.version[:3])'`]
 	AC_SUBST(PYTHON_VERSION)
 	AC_DEFINE([HAVE_PYTHON],1,[Define to 1 if python support is enabled])
 fi
@@ -98,29 +98,12 @@ else
 fi
 AC_SUBST(LDCONFIG)
 
-pkg_modules="gtk+-2.0 >= 2.0.0 gthread-2.0"
-PKG_CHECK_MODULES([GTK], [$pkg_modules])
-AC_SUBST(GTK_CFLAGS)
-AC_SUBST(GTK_LIBS)
-
 AC_OUTPUT(
 	[Makefile]
 	[defs.mak]
 	[common/include/lib.mak]
-	[doc/Makefile]
-	[man/Makefile]
 	[libcwiid/Makefile]
 	[libcwiid/cwiid.pc]
-	[wmdemo/Makefile]
-	[wmgui/Makefile]
-	[wminput/Makefile]
-	[wminput/plugins/Makefile]
-	[wminput/plugins/ir_ptr/Makefile]
-	[wminput/plugins/acc/Makefile]
-	[wminput/plugins/nunchuk_acc/Makefile]
-	[wminput/plugins/led/Makefile]
- 	[wminput/plugins/nunchuk_stick2btn/Makefile]
-	[lswm/Makefile]
 	[python/Makefile]
 	)
 

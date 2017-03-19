@@ -10,3 +10,4 @@ autom4te.cache
 config.*
 configure
 defs.mak
+python/installed_files.txt

@@ -32,7 +32,7 @@ extern PyTypeObject Wiimote_Type;
 extern PyObject *ConvertMesgArray(int, union cwiid_mesg []);
 
 /* cwiid module initializer */
-PyMODINIT_FUNC initcwiid(void);
+PyMODINIT_FUNC PyInit_cwiid(void);
 
 /* constants, enumerations */
 #define CWIID_CONST_MACRO(a) {#a, CWIID_##a}
@@ -135,36 +135,47 @@ static PyMethodDef Module_Methods[] =
 	{NULL, NULL, 0, NULL}
 };
 
-PyMODINIT_FUNC initcwiid(void)
+static struct PyModuleDef moduledef = {
+	PyModuleDef_HEAD_INIT,
+	"cwiid",             /* m_name */
+	"Cwiid FFS!",        /* m_doc */
+	-1,                  /* m_size */
+	Module_Methods,      /* m_methods */
+	NULL,                /* m_reload */
+	NULL,                /* m_traverse */
+	NULL,                /* m_clear */
+	NULL,                /* m_free */
+};
+
+PyMODINIT_FUNC PyInit_cwiid(void)
 {
 	PyObject *Module;
-	PyObject *CObj;
+	PyObject *CCapsule;
 	int i;
 
-	PyEval_InitThreads();
-
-	if (PyType_Ready(&Wiimote_Type) < 0) {
+	if (!(Module = PyModule_Create(&moduledef))) {
 		return;
 	}
 
-	if (!(Module = Py_InitModule3("cwiid", Module_Methods,
-	  "CWiid Wiimote Interface"))) {
-		return;
-	}
+	Wiimote_Type.tp_new = PyType_GenericNew;
+    if (PyType_Ready(&Wiimote_Type) < 0) {
+        return NULL;
+    }
 
-	Py_INCREF(&Wiimote_Type);
-	PyModule_AddObject(Module, "Wiimote", (PyObject*)&Wiimote_Type);
+    Py_INCREF(&Wiimote_Type);
+    PyModule_AddObject(Module, "Wiimote", (PyObject *)&Wiimote_Type);
 
-	for (i = 0; cwiid_constants[i].name; i++) {
+    for (i = 0; cwiid_constants[i].name; i++) {
 		/* No way to report errors from here, so just ignore them and hope
 		 * for segfault */
 		PyModule_AddIntConstant(Module, cwiid_constants[i].name,
 		                        cwiid_constants[i].value);
 	}
 
-	if (!(CObj = PyCObject_FromVoidPtr(ConvertMesgArray, NULL))) {
+	if (!(CCapsule = PyCapsule_New(ConvertMesgArray, "dynamr", NULL))) {
 		return;
 	}
-	PyModule_AddObject(Module, "ConvertMesgArray", CObj);
+	PyModule_AddObject(Module, "ConvertMesgArray", CCapsule);
+	
+	return Module;
 }
-
