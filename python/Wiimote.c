@@ -107,12 +107,11 @@ static PyGetSetDef Wiimote_GetSet[] = {
 };
 
 PyTypeObject Wiimote_Type = {
-//	PyObject_HEAD_INIT(NULL)
 	PyVarObject_HEAD_INIT(NULL, 0)
-	"cwiid.Wiimote",		/* tp_name */
-	sizeof(Wiimote),		/* tp_basicsize */
+	"cwiid.Wiimote",				/* tp_name */
+	sizeof(Wiimote),				/* tp_basicsize */
 	0,						/* tp_itemsize */
-	(destructor)Wiimote_dealloc,	/* tp_dealloc */
+	(destructor)Wiimote_dealloc,			/* tp_dealloc */
 	0,						/* tp_print */
 	0,						/* tp_getattr */
 	0,						/* tp_setattr */
@@ -128,24 +127,24 @@ PyTypeObject Wiimote_Type = {
 	0,						/* tp_setattro */
 	0,						/* tp_as_buffer */
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,	/* tp_flags */
-	"CWiid Wiimote connection object",	/* tp_doc */
+	"CWiid Wiimote connection object",		/* tp_doc */
 	0,						/* tp_traverse */
 	0,						/* tp_clear */
 	0,						/* tp_richcompare */
 	0,						/* tp_weaklistoffset */
 	0,						/* tp_iter */
 	0,						/* tp_iternext */
-	Wiimote_Methods,		/* tp_methods */
+	Wiimote_Methods,				/* tp_methods */
 	0,						/* tp_members */
-	Wiimote_GetSet,			/* tp_getset */
+	Wiimote_GetSet,					/* tp_getset */
 	0,						/* tp_base */
 	0,						/* tp_dict */
 	0,						/* tp_descr_get */
 	0,						/* tp_descr_set */
 	0,						/* tp_dictoffset */
-	(initproc)Wiimote_init,	/* tp_init */
+	(initproc)Wiimote_init,				/* tp_init */
 	0,						/* tp_alloc */
-	Wiimote_new,			/* tp_new */
+	Wiimote_new,					/* tp_new */
 };
 
 /* Allocate and deallocate functions */

@@ -137,14 +137,14 @@ static PyMethodDef Module_Methods[] =
 
 static struct PyModuleDef moduledef = {
 	PyModuleDef_HEAD_INIT,
-	"cwiid",             /* m_name */
-	"Cwiid FFS!",        /* m_doc */
-	-1,                  /* m_size */
-	Module_Methods,      /* m_methods */
-	NULL,                /* m_reload */
-	NULL,                /* m_traverse */
-	NULL,                /* m_clear */
-	NULL,                /* m_free */
+	"cwiid",        /* m_name */
+	"Cwiid FFS!",   /* m_doc */
+	-1,             /* m_size */
+	Module_Methods, /* m_methods */
+	NULL,           /* m_reload */
+	NULL,           /* m_traverse */
+	NULL,           /* m_clear */
+	NULL,           /* m_free */
 };
 
 PyMODINIT_FUNC PyInit_cwiid(void)
@@ -158,18 +158,18 @@ PyMODINIT_FUNC PyInit_cwiid(void)
 	}
 
 	Wiimote_Type.tp_new = PyType_GenericNew;
-    if (PyType_Ready(&Wiimote_Type) < 0) {
-        return NULL;
-    }
+	if (PyType_Ready(&Wiimote_Type) < 0) {
+		return NULL;
+	}
 
-    Py_INCREF(&Wiimote_Type);
-    PyModule_AddObject(Module, "Wiimote", (PyObject *)&Wiimote_Type);
+	Py_INCREF(&Wiimote_Type);
+	PyModule_AddObject(Module, "Wiimote", (PyObject *)&Wiimote_Type);
 
-    for (i = 0; cwiid_constants[i].name; i++) {
+	for (i = 0; cwiid_constants[i].name; i++) {
 		/* No way to report errors from here, so just ignore them and hope
 		 * for segfault */
 		PyModule_AddIntConstant(Module, cwiid_constants[i].name,
-		                        cwiid_constants[i].value);
+								cwiid_constants[i].value);
 	}
 
 	if (!(CCapsule = PyCapsule_New(ConvertMesgArray, "dynamr", NULL))) {
