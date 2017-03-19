@@ -1,4 +1,6 @@
-# CWiid Wiimote Interface
+# CWiid Wiimote Interface
+
+[![Build Status](https://travis-ci.org/azzra/python3-wiimote.svg?branch=master)](https://travis-ci.org/azzra/python3-wiimote)
 
 ## DESCRIPTION
 
@@ -29,7 +31,7 @@ sudo make install
 
 > If you install only the Python extension, be sure you have the library installed (`apt-get install libcwiid1`)
 
-## Credits
+## Credits
 
 Original libcwiid & Python module author: L. Donnie Smith <donnie.smith@gatech.edu> https://github.com/abstrakraft/cwiid
-I just made it working for Python3
+I just made the Python extension working for Python3
