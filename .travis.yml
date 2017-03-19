@@ -1,0 +1,12 @@
+language: c
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y python3-dev libbluetooth-dev
+
+script:
+  - aclocal
+  - autoconf
+  - ./configure
+  - make
+  - sudo make install
