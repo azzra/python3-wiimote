@@ -10,3 +10,5 @@ script:
   - ./configure
   - make
   - sudo make install
+  - PYTHON_VERSION=$(python3 -c 'import sys; print(sys.version[:3])')
+  - PYTHONPATH=/usr/local/lib/python${PYTHON_VERSION}/site-packages python3 -c 'import cwiid' 
