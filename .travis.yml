@@ -1,14 +1,26 @@
-language: c
+language: python
 
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y python3-dev libbluetooth-dev
 
+python:
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.5-dev"
+  - "3.6"
+  - "3.6-dev"
+  - "3.7-dev"
+  - "nightly"
+
 script:
-  - aclocal
-  - autoconf
-  - ./configure
-  - make
-  - sudo make install
-  - PYTHON_VERSION=$(python3 -c 'import sys; print(sys.version[:3])')
-  - PYTHONPATH=/usr/local/lib/python${PYTHON_VERSION}/site-packages python3 -c 'import cwiid' 
+  - |
+    aclocal
+    autoconf
+    ./configure
+    make
+    sudo make install
+    PYTHON_VERSION=$(python3 -c 'import sys; print(sys.version[:3])')
+    PYTHONPATH=/usr/local/lib/python${PYTHON_VERSION}/site-packages python3 -c 'import cwiid' 
