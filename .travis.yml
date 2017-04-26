@@ -2,7 +2,7 @@ language: python
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y python3-dev libbluetooth-dev
+  - sudo apt-get install -y libbluetooth-dev
 
 python:
   - "3.2"
@@ -21,6 +21,8 @@ script:
     autoconf
     ./configure
     make
+    cd libcwiid/
     sudo make install
-    PYTHON_VERSION=$(python3 -c 'import sys; print(sys.version[:3])')
-    PYTHONPATH=/usr/local/lib/python${PYTHON_VERSION}/site-packages python3 -c 'import cwiid' 
+    cd ../python/
+    python setup.py install
+    python -c 'import cwiid' 
