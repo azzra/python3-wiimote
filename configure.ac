@@ -1,4 +1,4 @@
-AC_INIT(CWiid,0.6.00,donnie.smith@gatech.edu)
+AC_INIT(CWiid,3.0.0,https://github.com/azzra/python3-wiimote/issues)
 AC_CONFIG_HEADER(common/include/config.h)
 
 AC_PROG_CC
@@ -70,24 +70,6 @@ AC_CHECK_HEADER([linux/uinput.h],,
 	[#include <linux/input.h>])
 
 AC_ISC_POSIX
-
-AC_ARG_WITH(cwiid-config-dir,AC_HELP_STRING([--with-cwiid-config-dir],
-	[CWiid configuration directory, default to $(sysconfdir)/cwiid]))
-if test -z $with_cwiid_config_dir; then
-	CWIID_CONFIG_DIR='${sysconfdir}/cwiid'
-else
-	CWIID_CONFIG_DIR=$with_cwiid_config_dir
-fi
-AC_SUBST(CWIID_CONFIG_DIR)
-
-AC_ARG_WITH(cwiid-plugins-dir,AC_HELP_STRING([--with-cwiid-plugins-dir],
-	[CWiid plugins directory, default to $(libdir)/cwiid/plugins]))
-if test -n $with_cwiid_plugins_dir; then
-	CWIID_PLUGINS_DIR='${libdir}/cwiid/plugins'
-else
-	CWIID_PLUGINS_DIR=$with_cwiid_plugins_dir
-fi
-AC_SUBST(CWIID_PLUGINS_DIR)
 
 AC_ARG_WITH(ldconfig,AC_HELP_STRING([--disable-ldconfig],
 	[don't execute ldconfig after install]))
