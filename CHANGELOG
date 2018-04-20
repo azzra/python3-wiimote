@@ -1,3 +1,8 @@
+2017-03-19 azzra
+	project
+	* remove lswm, wmdemo, wminput, wmgui
+	* compatibility with Python3
+
 2007-08-26 L. Donnie Smith <donnie.smith@gatech.edu>
 	docs
 	* updated wminput man page
