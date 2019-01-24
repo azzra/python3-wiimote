@@ -158,7 +158,6 @@ static PyObject *
 	}
 
 	self->wiimote = NULL;
-	Py_INCREF(self->callback = Py_None);
 	self->close_on_dealloc = 0;
 
 	return (PyObject*) self;
@@ -209,6 +208,10 @@ static int Wiimote_init(Wiimote* self, PyObject* args, PyObject *kwds)
 			bdaddr = *BDADDR_ANY;
 		}
 
+        if (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 5) {
+            PyEval_InitThreads();
+        }
+
 		Py_BEGIN_ALLOW_THREADS
 		wiimote = cwiid_open(&bdaddr, flags);
 		Py_END_ALLOW_THREADS
@@ -223,6 +226,7 @@ static int Wiimote_init(Wiimote* self, PyObject* args, PyObject *kwds)
 	}
 
 	cwiid_set_data(wiimote, self);
+	Py_INCREF(self->callback = Py_None);
 	self->wiimote = wiimote;
 	return 0;
 }
@@ -326,6 +330,7 @@ static int
 
 	Py_INCREF(NewCallback);
 	Py_DECREF(OldCallback);
+
 	self->callback = NewCallback;
 
 	return 0;
