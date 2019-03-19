@@ -154,7 +154,7 @@ PyMODINIT_FUNC PyInit_cwiid(void)
 	int i;
 
 	if (!(Module = PyModule_Create(&moduledef))) {
-		return;
+		return NULL;
 	}
 
 	Wiimote_Type.tp_new = PyType_GenericNew;
@@ -173,7 +173,7 @@ PyMODINIT_FUNC PyInit_cwiid(void)
 	}
 
 	if (!(CCapsule = PyCapsule_New(ConvertMesgArray, "dynamr", NULL))) {
-		return;
+		return NULL;
 	}
 	PyModule_AddObject(Module, "ConvertMesgArray", CCapsule);
 	
