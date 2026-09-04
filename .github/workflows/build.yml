@@ -1,0 +1,80 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    # 3.9 exercises the pre-3.10 buffer API branch of python/Wiimote.c,
+    # the other versions the modern one.
+    name: python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libbluetooth-dev flex bison
+
+      # setuptools is not bundled with python 3.12+, and setup.py needs it
+      # since distutils was dropped from the standard library
+      - name: Install python build dependencies
+        run: python -m pip install --upgrade pip setuptools
+
+      - name: Generate configure
+        run: aclocal && autoconf
+
+      - name: Configure
+        run: ./configure
+
+      - name: Build
+        run: make
+
+      - name: Smoke test
+        run: |
+          export LD_LIBRARY_PATH="$PWD/libcwiid"
+          export PYTHONPATH="$(echo python/build/lib.*)"
+          python - <<'EOF'
+          import cwiid
+
+          print('loaded', cwiid.__file__)
+
+          # the extension exposes the type and the CWIID_* constants
+          for name in ('BTN_A', 'RPT_BTN', 'MESG_ACC', 'FLAG_MESG_IFC',
+                       'IR_X_MAX'):
+              assert isinstance(getattr(cwiid, name), int), name
+
+          for name in ('close', 'enable', 'disable', 'get_mesg', 'read',
+                       'write', 'send_rpt', 'request_status'):
+              assert callable(getattr(cwiid.Wiimote, name)), name
+
+          # no wiimote here: check the methods are callable and reject a
+          # closed connection instead of crashing
+          wiimote = cwiid.Wiimote.__new__(cwiid.Wiimote)
+          for call in (lambda: wiimote.read(0, 0, 4),
+                       lambda: wiimote.write(0, 0, b'ab'),
+                       lambda: wiimote.send_rpt(0, 0, b'ab'),
+                       lambda: wiimote.close()):
+              try:
+                  call()
+              except ValueError as err:
+                  assert 'closed' in str(err), err
+              else:
+                  raise AssertionError('expected a closed Wiimote error')
+
+          print('smoke test ok')
+          EOF
