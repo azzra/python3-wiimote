@@ -33,15 +33,19 @@ AC_ARG_WITH(
 		;;
 	esac],
 	[REQUIRE_PYTHON=1; PYTHON_NAME=python3])
-if test $REQUIRE_PYTHON; then
+if test -n "$REQUIRE_PYTHON"; then
 	AC_CHECK_PROGS([PYTHON],$PYTHON_NAME)
-	if test $REQUIRE_PYTHON -a ! $PYTHON; then
+	if test -z "$PYTHON"; then
 		AC_MSG_ERROR([$PYTHON_NAME not found])
 	fi
 fi
 AC_SUBST(PYTHON)
-if test $PYTHON; then
-	PYTHON_VERSION=[`$PYTHON -c 'import sys; print(sys.version[:3])'`]
+if test -n "$PYTHON"; then
+	dnl sys.version[:3] gives "3.1" for 3.10 and later: ask for the version
+	dnl fields instead of slicing the version string
+	AC_MSG_CHECKING([python version])
+	PYTHON_VERSION=`$PYTHON -c 'import sys; print("%d.%d" % (sys.version_info.major, sys.version_info.minor))'`
+	AC_MSG_RESULT([$PYTHON_VERSION])
 	AC_SUBST(PYTHON_VERSION)
 	AC_DEFINE([HAVE_PYTHON],1,[Define to 1 if python support is enabled])
 fi
