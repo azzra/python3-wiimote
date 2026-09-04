@@ -1,7 +1,5 @@
 # CWiid Wiimote Interface
 
-[![Build Status](https://travis-ci.org/azzra/python3-wiimote.svg?branch=master)](https://travis-ci.org/azzra/python3-wiimote)
-
 ## DESCRIPTION
 
 The CWiid package contains the following parts:
@@ -26,7 +24,7 @@ make
 Install the library with package manager & the extension from the sources
 
 ```sh
-apt-get install libcwiid1
+apt install libcwiid1
 cd python
 sudo make install
 ```
