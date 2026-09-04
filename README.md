@@ -10,11 +10,9 @@ The CWiid package contains the following parts:
 
 ## REQUIREMENTS
 
-awk, bison, flex, bluez-libs, python 3.5 or greater, python dev for python module, kernel sources
+awk, bison, flex, bluez-libs, python 3+, python-dev for python module, kernel sources
 
 ## INSTALLATION
-
-First of all, you need to prepare the environment:
 
 ```sh
 aclocal
@@ -23,9 +21,9 @@ autoconf
 make
 ```
 
-### Only extension
+### Only Python extension
 
-Install the library with package manger & the extension from the sources
+Install the library with package manager & the extension from the sources
 
 ```sh
 apt-get install libcwiid1

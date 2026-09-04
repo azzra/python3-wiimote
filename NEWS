@@ -1,3 +1,6 @@
+3.0.0
+	- remove lswm, wmdemo, wminput, wmgui
+	- compatibility with Python3
 0.6.00
 	- renamed libwiimote to libcwiid to avoid naming conflict with other projects
 	- rewrite of libcwiid architecture
