@@ -1,5 +1,9 @@
 2017-03-19 azzra
 	project
+	* compatibility with Python 3.10+
+
+2017-03-19 azzra
+	project
 	* remove lswm, wmdemo, wminput, wmgui
 	* compatibility with Python3
 

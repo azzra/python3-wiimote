@@ -20,11 +20,23 @@
  *
  */
 
+/* Must be defined before Python.h: lengths in the '#' argument-parsing
+ * formats are Py_ssize_t instead of int. Mandatory since python 3.10 --
+ * always define it, whichever formats are used. */
+#define PY_SSIZE_T_CLEAN
 #include "Python.h"
 #include "structmember.h"
 #include <errno.h>
+#include <stdint.h>
 #include <bluetooth/bluetooth.h>
 #include <cwiid.h>
+
+/* The old buffer protocol (PyObject_AsWriteBuffer) is deprecated since python
+ * 3.0 and removed since 3.10: both ways of filling a buffer are kept below,
+ * selected at compile time so that the module builds against any python 3. */
+#if PY_VERSION_HEX < 0x030A0000
+#define CWIID_OLD_BUFFER_API 1
+#endif
 
 typedef struct {
 	PyObject_HEAD
@@ -208,9 +220,11 @@ static int Wiimote_init(Wiimote* self, PyObject* args, PyObject *kwds)
 			bdaddr = *BDADDR_ANY;
 		}
 
-        if (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 5) {
-            PyEval_InitThreads();
-        }
+#if PY_VERSION_HEX < 0x03070000
+		/* Deprecated since 3.9, no-op since 3.7: the GIL is always
+		   initialized by Py_Initialize(). */
+		PyEval_InitThreads();
+#endif
 
 		Py_BEGIN_ALLOW_THREADS
 		wiimote = cwiid_open(&bdaddr, flags);
@@ -758,20 +772,23 @@ static PyObject *Wiimote_send_rpt(Wiimote *self, PyObject *args, PyObject *kwds)
 {
 	static char *kwlist[] = { "flags", "report", "buffer", NULL };
 	unsigned char flags, report;
-	void *buf;
-	int len;
+	Py_buffer buf;
+	int err;
 
 	if (!self->wiimote) {
 		SET_CLOSED_ERROR;
 		return NULL;
 	}
 
-	if (!PyArg_ParseTupleAndKeywords(args, kwds, "BBt#:cwiid.Wiimote.send_rpt",
-	                                 kwlist, &flags, &report, &buf, &len)) {
+	if (!PyArg_ParseTupleAndKeywords(args, kwds,
+	                                 "BBy*:cwiid.Wiimote.send_rpt",
+	                                 kwlist, &flags, &report, &buf)) {
 		return NULL;
 	}
 
-	if (cwiid_send_rpt(self->wiimote, flags, report, len, buf)) {
+	err = cwiid_send_rpt(self->wiimote, flags, report, buf.len, buf.buf);
+	PyBuffer_Release(&buf);
+	if (err) {
 		PyErr_SetString(PyExc_RuntimeError, "Error sending report");
 		return NULL;
 	}
@@ -784,9 +801,12 @@ static PyObject *Wiimote_read(Wiimote *self, PyObject *args, PyObject *kwds)
 	static char *kwlist[] = { "flags", "offset", "len", NULL };
 	unsigned char flags;
 	unsigned int offset;
-	Py_ssize_t len;
+	unsigned int len;
 	void *buf;
 	PyObject *pyRetBuf;
+#ifdef CWIID_OLD_BUFFER_API
+	Py_ssize_t buf_len;
+#endif
 
 	if (!self->wiimote) {
 		SET_CLOSED_ERROR;
@@ -798,14 +818,25 @@ static PyObject *Wiimote_read(Wiimote *self, PyObject *args, PyObject *kwds)
 		return NULL;
 	}
 
-	if (!(pyRetBuf = malloc(len))) {
+	/* cwiid_read takes a uint16_t length: refuse what it cannot fill */
+	if (len > UINT16_MAX) {
+		PyErr_SetString(PyExc_ValueError, "len too large");
 		return NULL;
 	}
-	if (PyObject_AsWriteBuffer(pyRetBuf, &buf, &len)) {
+
+	/* mutable buffer, as advertised by the method docstring */
+	if (!(pyRetBuf = PyByteArray_FromStringAndSize(NULL, len))) {
+		return NULL;
+	}
+#ifdef CWIID_OLD_BUFFER_API
+	if (PyObject_AsWriteBuffer(pyRetBuf, &buf, &buf_len)) {
 		Py_DECREF(pyRetBuf);
 		return NULL;
 	}
-	if (cwiid_read(self->wiimote,flags,offset,len,buf)) {
+#else
+	buf = PyByteArray_AS_STRING(pyRetBuf);
+#endif
+	if (cwiid_read(self->wiimote, flags, offset, len, buf)) {
 		PyErr_SetString(PyExc_RuntimeError, "Error reading wiimote data");
 		Py_DECREF(pyRetBuf);
 		return NULL;
@@ -819,20 +850,30 @@ static PyObject *Wiimote_write(Wiimote *self, PyObject *args, PyObject *kwds)
 	static char *kwlist[] = { "flags", "offset", "buffer", NULL };
 	unsigned char flags;
 	unsigned int offset;
-	void *buf;
-	int len;
+	Py_buffer buf;
+	int err;
 
 	if (!self->wiimote) {
 		SET_CLOSED_ERROR;
 		return NULL;
 	}
 
-	if (!PyArg_ParseTupleAndKeywords(args, kwds, "BIt#:cwiid.Wiimote.write",
-	                                 kwlist, &flags, &offset, &buf, &len)) {
+	if (!PyArg_ParseTupleAndKeywords(args, kwds,
+	                                 "BIy*:cwiid.Wiimote.write",
+	                                 kwlist, &flags, &offset, &buf)) {
 		return NULL;
 	}
 
-	if (cwiid_write(self->wiimote, flags, offset, len, buf)) {
+	/* cwiid_write takes a uint16_t length: refuse what it cannot send */
+	if (buf.len > UINT16_MAX) {
+		PyBuffer_Release(&buf);
+		PyErr_SetString(PyExc_ValueError, "buffer too large");
+		return NULL;
+	}
+
+	err = cwiid_write(self->wiimote, flags, offset, buf.len, buf.buf);
+	PyBuffer_Release(&buf);
+	if (err) {
 		PyErr_SetString(PyExc_RuntimeError, "Error writing wiimote data");
 		return NULL;
 	}

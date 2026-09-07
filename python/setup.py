@@ -1,4 +1,9 @@
-from distutils.core import setup, Extension
+# distutils was removed from the standard library in python 3.12: prefer
+# setuptools, fall back to distutils for older pythons without setuptools.
+try:
+    from setuptools import setup, Extension
+except ImportError:
+    from distutils.core import setup, Extension
 
 setup(
     name='cwiid',
